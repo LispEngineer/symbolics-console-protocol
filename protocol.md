@@ -78,6 +78,15 @@ no other keys or locks are down).
 
 Code refers to a scroll lock and a num lock as well, and various other locks.
 
+## Status commands
+
+Status can return:
+* 0 - Brightness
+* 1 - Volume
+* 2 - Switchpack (?) whatever that is
+* 4 - Modem status
+
+
 # System/Console boot
 
 # TODO
@@ -208,9 +217,26 @@ Code refers to a scroll lock and a num lock as well, and various other locks.
   * Also `define-kbd-shift-bit`
 * Source code: `sys.sct/sys/cold-load-stream.lisp`,
   function: `KBD-CONVERT-TO-SOFTWARE-CHAR-COLD`
+* Source code: `sys.sct/serial/console-interface.lisp`,
+  has information on serial interface
+* Source code: `sys.sct/l-sys/console.lisp`,
+  flavor function: `initialize-keyboard shared-nbs-console` and
+  function: `console-send-command`
 
+```lisp
+  ;; Start reading some parameters.
+  (console-send-command self #2r10010000 0)     ;make it tell us the current brightness
+  (console-send-command self #2r10010010 0)     ;make it tell us the current volume
 
+  (console-send-command self
+                        (dpb (ldb (byte 1 7) funny-brightness) (byte 1 0) #2r10010000)
+                        (ldb (byte 7 0) funny-brightness))
 
+  (console-send-command self #2r10010010 (ldb (byte 6 0) (cvt-to-funny-volume new)))
+
+  ;; Reset the console
+  (console-send-command self #b10000000 nil t)
+```
 
 
 
