@@ -57,6 +57,20 @@ Additional equipment used:
 
 TODO
 
+# Miscellaneous Notes
+
+There is a conflict between the Altera USB-Blaster and the Digilent Analog
+Discovery 2. They both seem to use FTDI USB interface chips, and plugging
+both into the same USB port (by way of a hub) can make the Altera (Quartus)
+jtagserver/jtagconfig not see the Altera USB Blaster. So, plug them in in
+different ports or orders until you find one that allows both to be used
+concurrently.
+
+Got an odd error once from Waveforms:
+The device is being used by another application SERC: 1001
+JTAG-IDs h44002093 h00000000
+Device programming failed.
+
 # References
 
 * Atmel [Manchester Coding Basics](http://ww1.microchip.com/downloads/en/AppNotes/Atmel-9164-Manchester-Coding-Basics_Application-Note.pdf)
