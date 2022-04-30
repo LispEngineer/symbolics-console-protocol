@@ -158,8 +158,8 @@ biphase_to_nrz bip2nrz (
 	.clk(clock),
   .rst(reset),
   
-  // .biphase_in_raw(rs422_rxd),
-  .biphase_in_raw(~KEY[3]), // Debug
+  .biphase_in_raw(rs422_rxd),
+  // .biphase_in_raw(~KEY[3]), // Debug
 
   .nrz_out(rs422_received),
   .clock_out(rs422_clk),
@@ -176,7 +176,7 @@ assign GPIO[12] = rs422_clk;
 assign GPIO[13] = rs422_received;
 assign GPIO[14] = nrz_received;
 assign GPIO[15] = nrz_framing_error;
-assign GPIO[16] = bip_counter_overflow; // nrz_glitch;
+assign GPIO[16] = nrz_glitch; /* bip_counter_overflow; */
 
 // Show stuff
 assign LEDR[0] = reset;

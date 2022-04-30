@@ -9,6 +9,7 @@ Digilent RS-422 PMOD.
 ## Signal Information
 
 The signal is RS-422 based, but uses a Biphase encoding.
+(This seems also to be called Differential Manchester encoding.)
 * Marking (1) is a long pulse either high or low
 * Spacing (0) is a pair of shorrt pulses, either high then low or vice versa
 
@@ -64,12 +65,20 @@ Discovery 2. They both seem to use FTDI USB interface chips, and plugging
 both into the same USB port (by way of a hub) can make the Altera (Quartus)
 jtagserver/jtagconfig not see the Altera USB Blaster. So, plug them in in
 different ports or orders until you find one that allows both to be used
-concurrently.
+concurrently. Or, just unplug the analog discovery when you want to program
+your Altera (Intel) FPGA over the USB-Blaster.
 
 Got an odd error once from Waveforms:
 The device is being used by another application SERC: 1001
 JTAG-IDs h44002093 h00000000
 Device programming failed.
+
+https://community.intel.com/t5/Programmable-Devices/USB-Blaster-driver-conflict-with-other-FTDI-kit/td-p/72754
+
+https://community.intel.com/t5/Programmable-Devices/USB-Blaster-conflicts-with-other-FTDI-device/td-p/260890
+
+https://forum.digilent.com/topic/8797-analog-discovery-2-and-altera-usb-blaster-conflict/
+
 
 # References
 
