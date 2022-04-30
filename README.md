@@ -1,4 +1,4 @@
-# Symbolics Console Decoder - Terasic Cyclone V GX 
+# Symbolics Console Decoder - Terasic Cyclone V GX Starter Kit
 
 **Copyright 2022 Douglas P. Fields, Jr. All Rights Reserved.**
 
@@ -52,6 +52,10 @@ Additional equipment used:
 * Rigol DS1074Z+ Oscilloscope
 * Tek TDS754A Oscilloscope
 * Custom Hirose to DB9/SMA cables, using 26AWG twisted pairs and 75 ohm RG-179 coax
+
+# SystemVerilog Implementation Notes
+
+TODO
 
 # References
 
