@@ -213,10 +213,10 @@ If these had binary assignments:
 Seems like the leading 1 means "command" of some sort per `wired-slb-console-process-byte`.
 
 This same function shows that the status can return:
-* Brightness
-* Volume
-* Switchpack (?) whatever that is
-* Modem status
+* 0 - Brightness
+* 1 - Volume
+* 2 - Switchpack (?) whatever that is
+* 4 - Modem status
 
 ## Mouse
 
@@ -270,6 +270,12 @@ Or, maybe left is internally wired the same as middle & right?
 * It can beep
 * It has brightness and volume
 * It can have audio
+
+
+### TODO
+
+* We will need to handle the "status request" from the computer to the console,
+  and then it responding with the info per the %type-status above:
 
 # Miscellaneous Notes
 
