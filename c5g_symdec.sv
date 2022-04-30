@@ -87,14 +87,17 @@ logic rs422_clk;
 logic nrz_received;
 logic nrz_framing_error;
 logic nrz_glitch;
+logic bip_counter_overflow;
 
+// Debugging
+logic framing_error_seen = '0;
 
 // ======================================================
 // DEFAULTS (remove if using these pins)
 
 // Output pins
 assign LEDG = '0;
-assign LEDR = '0;
+assign LEDR[9:3] = '0;
 assign UART_TX = '0;
 assign {SRAM_A, SRAM_CE_n, SRAM_LB_n, SRAM_OE_n, SRAM_UB_n, SRAM_WE_n} = '0;
 assign SD_CLK = '0;
@@ -155,13 +158,17 @@ biphase_to_nrz bip2nrz (
 	.clk(clock),
   .rst(reset),
   
-  .biphase_in_raw(rs422_rxd),
+  // .biphase_in_raw(rs422_rxd),
+  .biphase_in_raw(~KEY[3]), // Debug
 
   .nrz_out(rs422_received),
   .clock_out(rs422_clk),
   .data_received(nrz_received),
   .framing_error(nrz_framing_error),
-  .glitch_ignored(nrz_glitch)
+  .glitch_ignored(nrz_glitch),
+
+  // Debugging outputs
+  .counter_overflow(bip_counter_overflow)
 );
 
 // Output our received signals on GPIO for inspection
@@ -169,7 +176,20 @@ assign GPIO[12] = rs422_clk;
 assign GPIO[13] = rs422_received;
 assign GPIO[14] = nrz_received;
 assign GPIO[15] = nrz_framing_error;
-assign GPIO[16] = nrz_glitch;
+assign GPIO[16] = bip_counter_overflow; // nrz_glitch;
+
+// Show stuff
+assign LEDR[0] = reset;
+assign LEDR[1] = framing_error_seen;
+assign LEDR[2] = bip_counter_overflow;
+
+// Did we see a framing error? If so, remember it
+always_ff @(posedge clock) begin
+  if (reset)
+    framing_error_seen <= '0;
+  else if (nrz_framing_error)
+    framing_error_seen <= '1;
+end
 
 
 endmodule

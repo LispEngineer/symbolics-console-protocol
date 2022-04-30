@@ -77,7 +77,10 @@ module biphase_to_nrz #(
   output logic clock_out,
   output logic data_received,
   output logic framing_error,
-  output logic glitch_ignored
+  output logic glitch_ignored,
+
+  // Debugging outputs
+  output logic counter_overflow
 );
 
 // Derived parameters
@@ -88,7 +91,7 @@ localparam COUNTER_1 = { {(COUNTER_SIZE-1){1'b0}}, 1'b1};
 
 // Our counter and if it overflowed
 logic [COUNTER_SIZE-1:0] counter = '0;
-logic counter_overflow = '0;
+// logic counter_overflow = '0;
 
 // Synchronizer and comparison of biphase data
 logic biphase_in_1, biphase_in;
