@@ -62,4 +62,4 @@ module biphase_to_nrz (
 );
 
 
-endmodule;
+endmodule
