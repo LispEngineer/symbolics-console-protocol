@@ -55,6 +55,19 @@ module c5g_symdec(
   
 );
 
+//========================================================
+// Digilent PmodPS485 has these logic-level pins, used UART style
+// 1. ~RE Receive Enable (leave low or NC to get data, high for high impedance)
+// 2. TxD
+// 3. RxD
+// 4. DE  Driver Enable (high to send data, else high impedance)
+// And can accept 3.3 or 5V input
+
+logic rs422_re_n; // Receive enable (negative)
+logic rs422_txd;
+logic rs422_rxd;
+logic rs422_de;   // Driver enable (positive)
+
 //=======================================================
 //  REG/WIRE declarations
 
@@ -67,6 +80,13 @@ logic [6:0] HEX2, HEX3;
 
 // 7 Segment outputs
 logic [6:0] ss0, ss1, ss2, ss3;
+
+// Decoded RS422 biphase data
+logic rs422_received;
+logic rs422_clk;
+logic nrz_received;
+logic nrz_framing_error;
+logic nrz_glitch;
 
 
 // ======================================================
@@ -82,8 +102,10 @@ assign SD_CLK = '0;
 // Bidi pins - set them to high impedance
 assign SRAM_D = 'z;
 assign {SD_CMD, SD_DAT} = 'z;
-// Rest of GPIO used for HEX2-3
-assign GPIO[21:0] = 'z;
+// Skip GPIO used for HEX2-3, Digilent PmodRS485, outputs of biphase decoder
+assign GPIO[21:17] = 'z;
+assign GPIO[11:5] = 'z;
+assign GPIO[2:0] = 'z;
 
 //=======================================================
 //  Structural coding
@@ -121,8 +143,33 @@ seven_segment hex3 (
   .hex(ss3)
 );
 
+// Digilent PmodRS422
+assign GPIO[4] = rs422_re_n;
+assign rs422_rxd = GPIO[3];
+// Nothing connected for the transmit/DE
+assign rs422_re_n = '0; // Constantly be receive enabled
+// This is connected to 5V right now
 
+// Decode our received biphase RS422 data to UART-style
+biphase_to_nrz bip2nrz (
+	.clk(clock),
+  .rst(reset),
+  
+  .biphase_in_raw(rs422_rxd),
 
+  .nrz_out(rs422_received),
+  .clock_out(rs422_clk),
+  .data_received(nrz_received),
+  .framing_error(nrz_framing_error),
+  .glitch_ignored(nrz_glitch)
+);
+
+// Output our received signals on GPIO for inspection
+assign GPIO[12] = rs422_clk;
+assign GPIO[13] = rs422_received;
+assign GPIO[14] = nrz_received;
+assign GPIO[15] = nrz_framing_error;
+assign GPIO[16] = nrz_glitch;
 
 
 endmodule
