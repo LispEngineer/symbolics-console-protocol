@@ -58,6 +58,89 @@ Additional equipment used:
 
 TODO
 
+# Reverse Engineering the Console Protocol
+
+With the NRZ data, it's possible to decode it using a logic analyzer
+set to UART mode at 75 kbaud. (The logic analyzer actually thinks it's
+running around 76.92 kbaud. This seems reasonable as it is almost a multiple
+of 19.2kbps which would be 76.8kbps.)
+
+Set to 8 data bits, one stop bit and no parity, console seems to send two bytes
+of data for each keypress and release. The keyboard has 88 keys on it.
+Two keys have a light (CAPS, MODE locks).
+
+TODO: See if it is 7 data bits + parity?
+TODO: What's the bit order? (WaveForms decodes UART LSB first.)
+
+## Recordings
+
+Record various keypresses using Waveforms.
+
+Waveforms settings:
+* Samples: 100M
+* Rate: 500 kHz
+* Mode: Record
+* Trigger: Normal, Simple (on UART data falling edge)
+
+
+### Pressed & released the keys a-m, one at a time:
+ 
+Key          Down      Up
+--------     -----     -----
+a            C0 29     A0 00
+b            C0 12     A0 00
+c            C0 11     A0 00
+d            C0 2A     A0 00
+e            C0 3A     A0 00
+f            C0 22     A0 00
+g            C0 2B     A0 00
+h            C0 23     A0 00
+i            C0 34     A0 00
+j            C0 2C     A0 00
+k            C0 24     A0 00
+l            C0 2D     A0 00
+m            C0 13     A0 00
+
+### Pressed a then b, then released b then a
+
+Key event    Code
+--------     -----
+a down       C0 29
+b down       C0 12
+b up         D0 12
+a up         A0 00
+
+### Pressed a then b, then released a then b
+
+Key event    Code
+--------     -----
+a down       C0 29
+b down       C0 12
+a up         D0 29
+b up         A0 00
+
+### Press a, b, c then release b, a, c
+
+Key event    Code
+--------     -----
+a down       C0 29
+b down       C0 12
+c down       C0 11
+b up         D0 12
+a up         D0 29
+c up         A0 00
+
+## Summary
+
+Code     Meaning
+-----    ----------  
+A0 00    All keys up
+C0 xx    Key down
+D0 xx    Key up
+
+
+
+
 # Miscellaneous Notes
 
 There is a conflict between the Altera USB-Blaster and the Digilent Analog
