@@ -130,6 +130,14 @@ b up         D0 12
 a up         D0 29
 c up         A0 00
 
+### What are these in different orders?
+
+Original  Reversed NOT      Reversed NOT
+--------  -------- -------  ------------
+A0        05       5F       FA 
+B0        0D       4F       F2
+C0        03       3F       FC
+
 ## Summary
 
 Code     Meaning
@@ -138,8 +146,130 @@ A0 00    All keys up
 C0 xx    Key down
 D0 xx    Key up
 
+xx = see `*symbolics-keyboard-mapping*`
+
+## Genera source code?
+
+Things to look at:
+* `si:*kbd-auto-repeat-enabled-p*`
+* sys.sct/l-sys/console.lisp (search around for keyboard and kbd)
+  * console-send-command - tell us current brightness & volume
+  * reset console command
+  * initialize-keyboard
+  * console-hardware-char-available and console-get-hardware-char
+* sys.sct/sys/console.lisp - generic console support
+  * console-convert-to-software-char
+  * tv:default-screen
+  * console-serial-read-byte
+  * There is a bunch of Keyboard definition stuff here, constants, shift bits
+  * %%kbd-hardware-char-key-number
+  * 4 mouse button names (:mouse-l, -m, -r, and -4)
+  * Some keys cannot autorepeat (#\Function, #\Select, Network, Suspend, etc.)
+  * ;; When the repeat key is pressed, we want to start repeating ;; the last character only if its key is still held down.
+  * %type-key-up %type-key-down %type-all-keys-up
+  * %%kbd-hardware-char-opcode
+  * `*symbolics-keyboard-mapping*` - this is the jackpot of 88 keys in order, counted in octal
+```
+    a - 51, 29, 41 (octal, hex, dec) 
+    b - 22, 12, 18
+    c - 21, 11
+    d - 52, 42
+    e - 72, 3A
+    f - 42, 22
+    m - 23, 13
+```
+* sys.sct/l-sys/wired-console.lisp
+  * `wired-slb-console-process-byte` - seems to handle console decoding
+  * Look up functions: ldb, ofb, ofb
+
+## Definitions in Lisp Source
+
+`sys.sct/l-sys/sysdef.lisp`
+Defines these 8
+```lisp
+(DEFENUMERATED *SLB-CONSOLE-BYTE-TYPES*
+               (%TYPE-MOUSE-SWITCH
+                %TYPE-MOUSE-MOVE
+                %TYPE-ALL-KEYS-UP
+                %TYPE-STATUS
+                %TYPE-KEY-DOWN
+                %TYPE-KEY-UP
+                %TYPE-SERIAL-WINDOW
+                %TYPE-SERIAL-IN))
+```                
+
+If these had binary assignments:
+
+                       raw     with 1bbbxxxx
+%TYPE-MOUSE-SWITCH     000     8x
+%TYPE-MOUSE-MOVE       001     9x
+%TYPE-ALL-KEYS-UP      010     Ax
+%TYPE-STATUS           011     Bx
+%TYPE-KEY-DOWN         100     Cx
+%TYPE-KEY-UP           101     Dx
+%TYPE-SERIAL-WINDOW    110     Ex
+%TYPE-SERIAL-IN        111     Fx
+
+Seems like the leading 1 means "command" of some sort per `wired-slb-console-process-byte`.
+
+This same function shows that the status can return:
+* Brightness
+* Volume
+* Switchpack (?) whatever that is
+* Modem status
+
+## Mouse
+
+Mouse stuff:
+* Mouse is processed 60 times a second per sys.sct/l-sys/wired-console.lisp
+  * mouse-kbd-button-transition
+
+Mouse movemends seem to send 1 byte at a time, hex codes like
+91 94 95 90 
+
+Mouse movements seem to be:
+Up:    92
+Down:  91
+Right: 94
+Left:  98
+
+Down/right: 95 (and 91, 94 mixed in)
+
+So, movements are 9x with the four directions as individual bits.
+
+Mouse buttons: down then up (with mouse ball in)
+Left     84 80
+Middle   82 80
+Right    81 80
+
+Took mouse ball out:
+LM down then up: 04 02 00 (why 0 and not 8?)
+
+Mouse seems to be unable to properly detect multiple mouse buttons
+pushed down simultaneously, or at least doesn't report multiple.
+
+LR down then up: 84 81 80
+MR down then up: 82 84 81 80
+
+Or, maybe left is internally wired the same as middle & right?
+
+## Reading the lisp
+
+* `ldb-test bytespec integer` is in sys.sct/sys2/lmmac.lisp
+  * not zero (ldb arg1 arg2)
+* `ldb` ./sys.sct/i-sys/opdef.lisp ./sys.sct/clcp/functions.lisp
+  * Manual: Symbolics Common Lisp Dictionary (Book 9) page 312
+  * Summary of Byte Manipulation Functions in Language Concepts manual
+    * p108, section 4.2.4.9
+    * Similar to Common Lisp
+  * Also see: [Bitsavers manual](http://www.bitsavers.org/pdf/symbolics/software/genera_8/Symbolics_Common_Lisp_Language_Concepts.pdf) PDF pages 107-108 (listed as pages 111-112)
 
 
+## Things to note about console
+
+* It can beep
+* It has brightness and volume
+* It can have audio
 
 # Miscellaneous Notes
 
