@@ -10,9 +10,10 @@ console sends seems to be reasonably simple.
 # Encoding
 
 Biphase (differential manchester) encoding around 75 kHz
-on RS-422. Long pulse is about 13 μs and the short pulses are half that.
+via RS-422. Long pulse is about 13 μs and the short pulses are half that.
 Long pulses are logical 1 (marking), and a pair of short pulses are a
 logical 0 (spacing).
+
 1 start bit, 8 data bits, 1 stop bit and no parity is used for the serial encoding.
 
 # Commands
@@ -26,11 +27,11 @@ wire, the LSB is sent first, so it looks backwards on an oscilloscope.
 `BBB` is the type of message the console is sending, from the possibilities below.
 The important ones are (in binary):
 
-* 000 - mouse button 
-* 001 - mouse move
-* 010 - all keys up
-* 100 - key down
-* 101 - key up
+* `000` - mouse button 
+* `001` - mouse move
+* `010` - all keys up
+* `100` - key down
+* `101` - key up
 
 `CCCC` is message dependent. 
 

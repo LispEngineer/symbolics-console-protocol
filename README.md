@@ -84,7 +84,8 @@ Waveforms settings:
 
 
 ### Pressed & released the keys a-m, one at a time:
- 
+
+``` 
 Key          Down      Up
 --------     -----     -----
 a            C0 29     A0 00
@@ -100,27 +101,33 @@ j            C0 2C     A0 00
 k            C0 24     A0 00
 l            C0 2D     A0 00
 m            C0 13     A0 00
+```
 
 ### Pressed a then b, then released b then a
 
+```
 Key event    Code
 --------     -----
 a down       C0 29
 b down       C0 12
 b up         D0 12
 a up         A0 00
+```
 
 ### Pressed a then b, then released a then b
 
+```
 Key event    Code
 --------     -----
 a down       C0 29
 b down       C0 12
 a up         D0 29
 b up         A0 00
+```
 
 ### Press a, b, c then release b, a, c
 
+```
 Key event    Code
 --------     -----
 a down       C0 29
@@ -129,24 +136,29 @@ c down       C0 11
 b up         D0 12
 a up         D0 29
 c up         A0 00
+```
 
 ### What are these in different orders?
 
+```
 Original  Reversed NOT      Reversed NOT
 --------  -------- -------  ------------
 A0        05       5F       FA 
 B0        0D       4F       F2
 C0        03       3F       FC
+```
 
 ## Summary
 
+```
 Code     Meaning
 -----    ----------  
 A0 00    All keys up
 C0 xx    Key down
 D0 xx    Key up
+```
 
-xx = see `*symbolics-keyboard-mapping*`
+`xx` = see `*symbolics-keyboard-mapping*`
 
 ## Genera source code?
 
@@ -200,6 +212,7 @@ Defines these 8
 
 If these had binary assignments:
 
+```
                        raw     with 1bbbxxxx
 %TYPE-MOUSE-SWITCH     000     8x
 %TYPE-MOUSE-MOVE       001     9x
@@ -209,6 +222,7 @@ If these had binary assignments:
 %TYPE-KEY-UP           101     Dx
 %TYPE-SERIAL-WINDOW    110     Ex
 %TYPE-SERIAL-IN        111     Fx
+```
 
 Seems like the leading 1 means "command" of some sort per `wired-slb-console-process-byte`.
 
@@ -228,28 +242,31 @@ Mouse movemends seem to send 1 byte at a time, hex codes like
 91 94 95 90 
 
 Mouse movements seem to be:
+```
 Up:    92
 Down:  91
 Right: 94
 Left:  98
+```
 
 Down/right: 95 (and 91, 94 mixed in)
 
 So, movements are 9x with the four directions as individual bits.
 
 Mouse buttons: down then up (with mouse ball in)
+```
 Left     84 80
 Middle   82 80
 Right    81 80
+```
 
 Took mouse ball out:
 LM down then up: 04 02 00 (why 0 and not 8?)
 
 Mouse seems to be unable to properly detect multiple mouse buttons
 pushed down simultaneously, or at least doesn't report multiple.
-
-LR down then up: 84 81 80
-MR down then up: 82 84 81 80
+* LR down then up: 84 81 80
+* MR down then up: 82 84 81 80
 
 Or, maybe left is internally wired the same as middle & right?
 
