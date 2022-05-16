@@ -1,4 +1,5 @@
 // Copyright 2022 Douglas P. Fields, Jr. All Rights Reserved
+// Originally from c5g_symdec project, transferred on 2022-05-14
 
 // Biphase to NRZ decoder
 //
@@ -86,7 +87,7 @@ module biphase_to_nrz #(
 // Derived parameters
 localparam LONG_PULSE = SHORT_PULSE * 2;
 localparam TOO_LONG_PULSE = SHORT_PULSE * 3;
-localparam COUNTER_SIZE = $clog2(LONG_PULSE);
+localparam COUNTER_SIZE = $clog2(TOO_LONG_PULSE);
 localparam COUNTER_1 = { {(COUNTER_SIZE-1){1'b0}}, 1'b1};
 
 // Our counter and if it overflowed
@@ -116,7 +117,9 @@ always_ff @(posedge clk) begin
     data_received <= '0;
     framing_error <= '0;
     glitch_ignored <= '0;
-    // Data and clock_out are irrelevant
+    // Data and clock_out are irrelevant, but...
+    // clock_out has to be reset for simulation
+    clock_out <= '0;
 
   end else if (biphase_last == biphase_in) begin ///////////////////////////////////
     // Handle no transition
