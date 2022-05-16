@@ -46,6 +46,20 @@ For the mouse move, `CCCC` is `LRUD` - a single bit indicating that the mouse
 moved in that particular direction at that time; with `LR` and `UD` mutually
 exclusive.
 
+TODO: Sometimes I see a `0x90` - with all `LRUD` zero. Not sure what that means *yet*.
+
+### Mouse repeat rate
+
+When moving the mouse quickly, it seems that the fastest it sends move
+commands from the console to the CPU is with a 22 bit-length latency between
+reports. This means 32 bit periods per report, which is about a 2.4kHz report
+rate.
+
+See the Waveforms recording `mouse-moving-fast.dwf3logicacq` for details,
+or look here:
+
+ ![Mouse moving fast report rate](mouse-moving-fast.png)
+
 ## Keyboard commands
 
 For key up/down messages, `CCCC` is always `0000`.
